@@ -1,35 +1,36 @@
 _ = require 'underscore-plus'
 {CompositeDisposable, Range} = require 'atom'
 
-TOC_START = '<!-- TOC START min:MIN_LEVEL max:MAX_LEVEL -->'
+TOC_START_TEMPLATE = "<!-- TOC START:CONFIG_PART -->"
+CONFIG_PART = " min:MIN_LEVEL max:MAX_LEVEL"
+
+TOC_START = TOC_START_TEMPLATE.replace('CONFIG_PART', CONFIG_PART)
 TOC_END = '<!-- TOC END -->'
 HEADER_REGEXP = /^(#+)\s*(.*$)$/g
 
-isTocExists = (editor) ->
-  # being tolerant to support old header(no 'max' option)
-  editor.lineTextForBufferRow(0).match(/^<!\-\- TOC START( .*)? \-\->$/)
+findExistingTOCRange = (editor) ->
+  rangeStart = null
+  rangeEnd = null
 
-isMarkDownEditor = (editor) ->
-  editor.getGrammar().scopeName is "source.gfm"
+  pattern = _.escapeRegExp(TOC_START_TEMPLATE).replace('CONFIG_PART', '.*')
+  pattern = ///^#{pattern}$///
+  scanRange = new Range([0, 0], editor.getEofBufferPosition())
+  editor.scanInBufferRange pattern, scanRange, ({range, stop}) ->
+    rangeStart = range.start
+    scanRange.start = range.end
+    stop()
 
-isValidHeader = (editor, bufferPosition) ->
-  scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition)
-  scopeDescriptor.scopes[1]?.startsWith('markup.heading')
-
-getRangeToInsert = (editor) ->
-  return unless isTocExists(editor)
+  return unless rangeStart?
 
   pattern = ///#{_.escapeRegExp(TOC_END)}///
-  rangeEnd = null
-  editor.scan pattern, ({range, stop}) ->
+  editor.scanInBufferRange pattern, scanRange, ({range, stop}) ->
     rangeEnd = range.end
     stop()
 
-  new Range([0, 0], rangeEnd) if rangeEnd?
+  new Range(rangeStart, rangeEnd) if rangeEnd?
 
-extractLinkText = (text) ->
-  text.replace(/\[(.*?)\]\(https?:\/\/.*\)/, "$1") # extract link txt
-
+# TOC generation
+# -------------------------
 linkFor = (text) ->
   text
     .toLowerCase()
@@ -43,6 +44,15 @@ generateToc = (headers) ->
     "#{indent.repeat(level-1)}- [#{subject}](##{linkFor(subject)})"
   .join("\n")
 
+# Extract markdown headers from editor
+# -------------------------
+extractLinkText = (text) ->
+  text.replace(/\[(.*?)\]\(https?:\/\/.*\)/, "$1") # extract link txt
+
+isValidHeader = (editor, bufferPosition) ->
+  scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition)
+  scopeDescriptor.scopes[1]?.startsWith('markup.heading')
+
 scanHeaders = (editor) ->
   headers = []
   editor.scan HEADER_REGEXP, ({match, range}) ->
@@ -52,47 +62,22 @@ scanHeaders = (editor) ->
     headers.push({level, subject})
   headers
 
-getTOCHeader = (minLevel, maxLevel) ->
-  TOC_START
-    .replace('MIN_LEVEL', minLevel)
-    .replace('MAX_LEVEL', maxLevel)
-
+# Misc
+# -------------------------
 TOC_START_REGEXP = _.escapeRegExp(TOC_START)
   .replace('MIN_LEVEL', '(\\d)')
   .replace('MAX_LEVEL', '(\\d)')
 
 extractTOCSpec = (text) ->
   spec = {}
-  if match = editor.lineTextForBufferRow(0).match(TOC_START_REGEXP)
+  if match = text.match(TOC_START_REGEXP)
     spec.minLevel = Math.max(match[1], 1)
     spec.maxLevel = Math.max(match[2], 1)
   spec
 
-insertToc = (editor, range=null) ->
-  if range?
-    isUpdate = true
-    {minLevel, maxLevel} = extractTOCSpec(editor.lineTextForBufferRow(0))
-  else
-    isUpdate = false
-    range = [[0, 0], [0, 0]]
-
-  minLevel ?= atom.config.get('markdown-toc-auto.initialMinLevel')
-  maxLevel ?= atom.config.get('markdown-toc-auto.initialMaxLevel')
-
-  headers = scanHeaders(editor).filter (header) -> minLevel <= header.level <=  maxLevel
-  toc = """
-    #{getTOCHeader(minLevel, maxLevel)}
-    #{generateToc(headers)}
-
-    #{TOC_END}
-    """
-
-  toc += "\n\n" unless isUpdate
-  editor.setTextInBufferRange(range, toc)
-
-updateToc = (editor) ->
-  if range = getRangeToInsert(editor)
-    insertToc(editor, range)
+getDefaultTOCSpec = ->
+  minLevel: atom.config.get('markdown-toc-auto.initialMinLevel')
+  maxLevel: atom.config.get('markdown-toc-auto.initialMaxLevel')
 
 # Main
 # -------------------------
@@ -103,13 +88,21 @@ module.exports =
     @subscriptionByBuffer = new Map
 
     @subscriptions = new CompositeDisposable
+    createToc = @createToc.bind(this)
     @subscribe atom.commands.add 'atom-text-editor[data-grammar="source gfm"]',
-      'markdown-toc-auto:insert-toc': -> insertToc(@getModel())
+      'markdown-toc-auto:insert-toc': -> createToc(@getModel(), @getModel().getCursorBufferPosition())
+      'markdown-toc-auto:insert-toc-at-top': -> createToc(@getModel(), [0, 0])
+
+    isMarkDownEditor = (editor) ->
+      editor.getGrammar().scopeName is "source.gfm"
 
     @subscribe atom.workspace.observeTextEditors (editor) =>
       return if @subscriptionByBuffer.has(editor.buffer)
+      # [FIXME] maybe buffer is different but path is same possibility?
       do (editor) =>
-        disposable = editor.onDidSave -> updateToc(editor) if isMarkDownEditor(editor)
+        disposable = editor.onDidSave =>
+          if isMarkDownEditor(editor) and (range = findExistingTOCRange(editor))
+            @updateToc(editor, range)
         @subscriptionByBuffer.set(editor.buffer, disposable)
 
   deactivate: ->
@@ -120,3 +113,30 @@ module.exports =
 
   subscribe: (arg) ->
     @subscriptions.add(arg)
+
+  createToc: (editor, point) ->
+    options = _.defaults(getDefaultTOCSpec(), update: false)
+    @insertToc(editor, [point, point], options)
+
+  updateToc: (editor, range) ->
+    tocStartText = editor.lineTextForBufferRow(range.start.row)
+    options = _.defaults(extractTOCSpec(tocStartText), update: true)
+    @insertToc(editor, range, options)
+
+  insertToc: (editor, range, {minLevel, maxLevel, update}) ->
+    headers = scanHeaders(editor).filter (header) ->
+      minLevel <= header.level <=  maxLevel
+
+    tocStart = TOC_START
+      .replace('MIN_LEVEL', minLevel)
+      .replace('MAX_LEVEL', maxLevel)
+
+    toc = """
+      #{tocStart}
+      #{generateToc(headers)}
+
+      #{TOC_END}
+      """
+
+    toc += "\n\n" unless update
+    editor.setTextInBufferRange(range, toc)

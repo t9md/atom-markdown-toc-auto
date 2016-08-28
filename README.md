@@ -1,4 +1,4 @@
-# markdown-toc-auto
+# markdown-toc-autoaa
 
 Automatically update table of contents for GitHub wiki.
 
@@ -23,7 +23,8 @@ Automatically update table of contents for GitHub wiki.
 
 # Commands
 
-- `markdown-toc-auto:insert-toc`: Insert TOC on top of buffer.
+- `markdown-toc-auto:insert-toc`: Insert TOC on cursor position.
+- `markdown-toc-auto:insert-toc-at-top`: Insert TOC on top of buffer.
 
 # Limitation
 
