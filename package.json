@@ -10,5 +10,21 @@
   },
   "dependencies": {
     "underscore-plus": "^1.6.6"
+  },
+  "configSchema": {
+    "initialMinLevel": {
+      "order": 0,
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Minimum header level used on initial insert"
+    },
+    "initialMaxLevel": {
+      "order": 1,
+      "type": "integer",
+      "minimum": 1,
+      "default": 3,
+      "description": "Maximum header level used on initial insert"
+    }
   }
 }
