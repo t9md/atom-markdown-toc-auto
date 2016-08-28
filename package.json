@@ -1,7 +1,7 @@
 {
   "name": "markdown-toc-auto",
   "main": "./lib/main",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "auto insert and update table of contents on save",
   "repository": "https://github.com/t9md/atom-markdown-toc-auto",
   "license": "MIT",
