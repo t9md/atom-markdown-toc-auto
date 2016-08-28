@@ -6,7 +6,7 @@ TOC_END = '<!-- TOC END -->'
 HEADER_REGEXP = /^(#+)\s*(.*$)$/g
 
 isTocExists = (editor) ->
-  # Need to tolerant to support old header(no 'max' option)
+  # being tolerant to support old header(no 'max' option)
   editor.lineTextForBufferRow(0).match(/^<!\-\- TOC START( .*)? \-\->$/)
 
 isMarkDownEditor = (editor) ->
