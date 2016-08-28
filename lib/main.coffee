@@ -61,12 +61,17 @@ TOC_START_REGEXP = _.escapeRegExp(TOC_START)
   .replace('MIN_LEVEL', '(\\d)')
   .replace('MAX_LEVEL', '(\\d)')
 
+extractTOCSpec = (text) ->
+  spec = {}
+  if match = editor.lineTextForBufferRow(0).match(TOC_START_REGEXP)
+    spec.minLevel = Math.max(match[1], 1)
+    spec.maxLevel = Math.max(match[2], 1)
+  spec
+
 insertToc = (editor, range=null) ->
   if range?
     isUpdate = true
-    if match = editor.lineTextForBufferRow(0).match(TOC_START_REGEXP)
-      minLevel = Math.max(match[1], 1)
-      maxLevel = Math.max(match[2], 1)
+    {minLevel, maxLevel} = extractTOCSpec(editor.lineTextForBufferRow(0))
   else
     isUpdate = false
     range = [[0, 0], [0, 0]]
@@ -75,7 +80,6 @@ insertToc = (editor, range=null) ->
   maxLevel ?= atom.config.get('markdown-toc-auto.initialMaxLevel')
 
   headers = scanHeaders(editor).filter (header) -> minLevel <= header.level <=  maxLevel
-
   toc = """
     #{getTOCHeader(minLevel, maxLevel)}
     #{generateToc(headers)}
