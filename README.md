@@ -1,15 +1,8 @@
-# markdown-toc-autoaa
+# markdown-toc-auto
 
 Automatically update table of contents for GitHub wiki.
 
 ![gif](https://raw.githubusercontent.com/t9md/t9md/12d553f0ec6d5ae921dea200ae2250f718a09523/img/atom-markdown-toc-auto.gif)
-
-# How to use
-
-1. Open markdown editor
-2. From command-palette, invoke "Markdown Toc Auto: Insert Toc". TOC is inserted at top of buffer.
-3. Each time you save editor, TOC is automatically updated.
-4. [Optional] You can change min/max header level to use by modifying TOC header(`<!-- TOC START min: 1 max:3 -->`) directly.
 
 # Features
 
@@ -20,6 +13,13 @@ Automatically update table of contents for GitHub wiki.
 - Generate link for GitHub wiki
   - Remove invalid char for link
   - Extract inner text(`xxx`) from `<kbd>xxx</kbd>` tag and use in link.
+
+# How to use
+
+1. Open markdown editor
+2. From command-palette, invoke "Markdown Toc Auto: Insert Toc". TOC is inserted at cursor position.
+3. Each time you save editor, TOC is automatically updated.
+4. [Optional] You can change min/max header level to use by modifying TOC header(`<!-- TOC START min: 1 max:3 -->`) directly.
 
 # Commands
 
