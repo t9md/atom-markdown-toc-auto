@@ -74,8 +74,7 @@ serializeTocOptions = (tocOptions) ->
 getDefaultTocOptions = ->
   settings.getTocOptions()
 
-insertToc = ({editor, range, create, tocOptions}) ->
-  return unless create or tocOptions.update
+insertToc = ({editor, range, tocOptions}) ->
   headers = scanHeaders(editor)
   toc = """
     <!-- TOC START #{serializeTocOptions(tocOptions)} -->
@@ -84,7 +83,7 @@ insertToc = ({editor, range, create, tocOptions}) ->
     #{TOC_END}
     """
 
-  toc += "\n\n" if create
+  toc += "\n\n" if range.isEmpty()
   editor.setTextInBufferRange(range, toc)
 
 # Public
@@ -93,7 +92,6 @@ createToc = (editor, point) ->
   insertToc(
     editor: editor
     range: [point, point]
-    create: true
     tocOptions: getDefaultTocOptions()
   )
 
@@ -103,11 +101,11 @@ updateToc = (editor, range) ->
   tocOptions = {}
   if match = tocStartText.match(TOC_START_REGEXP)
     tocOptions = deserializeTocOptions(match[1])
+    return unless tocOptions.update
 
   insertToc(
     editor: editor
     range: range
-    create: false
     tocOptions: _.defaults(tocOptions, getDefaultTocOptions())
   )
 
