@@ -1,4 +1,4 @@
-# markdown-toc-auto
+# markdown-toc-auto [![Build Status](https://travis-ci.org/t9md/atom-markdown-toc-auto.svg?branch=master)](https://travis-ci.org/t9md/atom-markdown-toc-auto)
 
 Automatically update table of contents for GitHub wiki.
 
