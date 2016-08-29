@@ -1,7 +1,5 @@
 _ = require 'underscore-plus'
 {Range} = require 'atom'
-{inspect} = require 'util'
-
 settings = require './settings'
 
 TOC_END = '<!-- TOC END -->'
@@ -14,29 +12,29 @@ linkFor = (text) ->
   text
     .toLowerCase()
     .replace(/\s/g, '-')
-    .replace(/\<(.*?)>(.+)<\/\1>/g, "$2") # exract inner text
+    .replace(/\<(.*?)>(.+)<\/\1>/g, "$2") # e.g. exract 'a' from <kbd>a<kbd>
     .replace(/[^\w-]/g, '') # Remove non-(alphanumeric or '-') char.
 
 generateToc = (headers) ->
   indent = "  "
-  headers.map ({level, subject}) ->
-    "#{indent.repeat(level-1)}- [#{subject}](##{linkFor(subject)})"
-  .join("\n")
+  headers
+    .map ({level, subject}) -> "#{indent.repeat(level-1)}- [#{subject}](##{linkFor(subject)})"
+    .join("\n")
 
 # Extract markdown headers from editor
 # -------------------------
 extractLinkText = (text) ->
   text.replace(/\[(.*?)\]\(https?:\/\/.*\)/, "$1") # extract link txt
 
-isValidHeader = (editor, bufferPosition) ->
-  scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition)
-  scopeDescriptor.scopes[1]?.startsWith('markup.heading')
+isMarkdownHeader = (editor, bufferPosition) ->
+  {scopes} = editor.scopeDescriptorForBufferPosition(bufferPosition)
+  scopes[1]?.startsWith('markup.heading')
 
 MARKDOWN_HEADER_REGEXP = /^(#+)\s*(.*$)$/g
 scanHeaders = (editor) ->
   headers = []
   editor.scan MARKDOWN_HEADER_REGEXP, ({match, range}) ->
-    return unless isValidHeader(editor, range.start)
+    return unless isMarkdownHeader(editor, range.start)
     level = match[1].length
     subject = extractLinkText(match[2])
     headers.push({level, subject})
@@ -44,41 +42,34 @@ scanHeaders = (editor) ->
 
 # Misc
 # -------------------------
-extractTocSpec = (text) ->
-  spec = {}
-  if match = text.match(TOC_START_REGEXP)
-    params = match[1].trim().split(/\s+/)
-    for param in params
-      [key, value] = param.split(':')
-      switch key
-        when 'min', 'max'
-          spec[key] = Number(value)
-        else
-          if value in ['true', 'false']
-            spec[key] = value is 'true'
-    spec
+deserializeTocOptions = (text) ->
+  options = {}
+  for param in text.trim().split(/\s+/)
+    [key, value] = param.split(':')
+    switch key
+      when 'min', 'max'
+        options[key] = Number(value)
+      else
+        options[key] = value is 'true' if value in ['true', 'false']
+  options
 
-serializeTocSpec = (tocSpec) ->
-  JSON.stringify(tocSpec)
+serializeTocOptions = (tocOptions) ->
+  JSON.stringify(tocOptions)
     .replace(/[{"}]/g, '')
     .replace(/,/g, ' ')
 
-getDefaultTocSpec = ->
-  settings.getSpecOptions()
+getDefaultTocOptions = ->
+  settings.getTocOptions()
 
-insertToc = (editor, range, create=false, tocSpec) ->
+insertToc = ({editor, range, create, tocOptions}) ->
   headers = scanHeaders(editor).filter (header) ->
-    tocSpec.min <= header.level <= tocSpec.max
+    tocOptions.min <= header.level <= tocOptions.max
 
-  # console.log tocSpec.update
-  {inspect} = require 'util'
-  p = (args...) -> console.log inspect(args...)
-  p tocSpec
-  return if (not create) and (not tocSpec.update)
+  return if (not create) and (not tocOptions.update)
 
-  tocSpecString = serializeTocSpec(tocSpec)
+  tocOptionsString = serializeTocOptions(tocOptions)
   toc = """
-    <!-- TOC START #{tocSpecString} -->
+    <!-- TOC START #{tocOptionsString} -->
     #{generateToc(headers)}
 
     #{TOC_END}
@@ -90,30 +81,44 @@ insertToc = (editor, range, create=false, tocSpec) ->
 # Public
 # -------------------------
 exports.createToc = (editor, point) ->
-  insertToc(editor, [point, point], true, getDefaultTocSpec())
+  insertToc(
+    editor: editor
+    range: [point, point]
+    create: true
+    tocOptions: getDefaultTocOptions()
+  )
 
 exports.updateToc = (editor, range) ->
   tocStartText = editor.lineTextForBufferRow(range.start.row)
-  options = _.defaults(extractTocSpec(tocStartText), getDefaultTocSpec())
-  insertToc(editor, range, false, options)
+
+  tocOptions = {}
+  if match = tocStartText.match(TOC_START_REGEXP)
+    tocOptions = deserializeTocOptions(match[1])
+
+  insertToc(
+    editor: editor
+    range: range
+    create: false
+    tocOptions: _.defaults(tocOptions, getDefaultTocOptions())
+  )
 
 exports.isMarkDownEditor = (editor) ->
   editor.getGrammar().scopeName is "source.gfm"
 
-exports.findExistingTocRange = (editor) ->
-  rangeStart = null
-  rangeEnd = null
+exports.findTocRange = (editor) ->
+  [startPoint, endPoint] = []
 
   scanRange = new Range([0, 0], editor.getEofBufferPosition())
+  tocStartRange = null
   editor.scanInBufferRange TOC_START_REGEXP, scanRange, ({range, stop}) ->
-    rangeStart = range.start
-    scanRange.start = range.end
+    tocStartRange = range
     stop()
 
-  return unless rangeStart?
+  return unless tocStartRange?
+  scanRange.start = tocStartRange.end
 
   editor.scanInBufferRange TOC_END_REGEXP, scanRange, ({range, stop}) ->
-    rangeEnd = range.end
+    tocEndRange = range
     stop()
 
-  new Range(rangeStart, rangeEnd) if rangeEnd?
+  new Range(tocStartRange.start, tocEndRange.end) if tocEndRange?

@@ -1,17 +1,11 @@
 {CompositeDisposable} = require 'atom'
-{
-  createToc
-  updateToc
-  isMarkDownEditor
-  findExistingTocRange
-} = require './utils'
+{createToc, updateToc, isMarkDownEditor, findTocRange} = require './utils'
 settings = require './settings'
 
 # Main
 # -------------------------
 module.exports =
   config: settings.config
-  paneContainerElement: null
 
   activate: ->
     @subscriptionByBuffer = new Map
@@ -26,7 +20,7 @@ module.exports =
       # [FIXME] maybe buffer is different but path is same possibility?
       do (editor) =>
         disposable = editor.onDidSave ->
-          updateToc(editor, range) if isMarkDownEditor(editor) and (range = findExistingTocRange(editor))
+          updateToc(editor, range) if isMarkDownEditor(editor) and (range = findTocRange(editor))
         @subscriptionByBuffer.set(editor.buffer, disposable)
 
   deactivate: ->

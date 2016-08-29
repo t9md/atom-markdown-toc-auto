@@ -1,5 +1,6 @@
-SPEC_KEYS = ['min', 'max', 'style', 'link', 'update']
 class Settings
+  tocOptionKeys: ['min', 'max', 'style', 'link', 'update']
+
   constructor: (@scope, @config) ->
     # Inject order props to display orderd in setting-view
     for name, i in Object.keys(@config)
@@ -17,33 +18,33 @@ class Settings
   set: (param, value) ->
     atom.config.set "#{@scope}.#{param}", value
 
-  getSpecOptions: ->
-    params = {}
-    for key in SPEC_KEYS
-      params[key] = @get(key)
-    params
-
-  specKeys: ->
-    SPEC_KEYS
+  getTocOptions: ->
+    options = {}
+    for key in @tocOptionKeys
+      options[key] = @get(key)
+    options
 
 module.exports = new Settings 'markdown-toc-auto',
   min:
     type: 'integer'
     minimum: 1
     default: 1
-    description: "Minimum header level used on initial insert"
+    description: "Minimum header level on create toc"
   max:
     type: 'integer'
     minimum: 1
-    default: 1
-    description: "Maximum header level used on initial insert"
+    default: 3
+    description: "Maximum header level on create toc"
   update:
     type: 'boolean'
     default: true
+    description: "Update option on create"
   link:
     type: 'boolean'
     default: true
+    description: "Link option on create"
   style:
     type: 'string'
     default: 'ul'
     enum: ['ul', 'ol']
+    description: "Style option on create"
