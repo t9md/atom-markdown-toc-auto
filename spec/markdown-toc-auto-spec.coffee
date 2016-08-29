@@ -5,7 +5,7 @@ describe "markdown-toc-auto", ->
       tocOptions = {
         min: 1, max: 1, link: true, update: true
       }
-      serialized = 'min:1 max:1 style:ul link:true update:true'
+      serialized = 'min:1 max:1 link:true update:true'
       expect(serializeTocOptions(tocOptions)).toBe(serialized)
 
     it "deserialize", ->
