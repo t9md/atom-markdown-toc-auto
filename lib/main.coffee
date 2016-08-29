@@ -5,10 +5,12 @@
   isMarkDownEditor
   findExistingTocRange
 } = require './utils'
+settings = require './settings'
 
 # Main
 # -------------------------
 module.exports =
+  config: settings.config
   paneContainerElement: null
 
   activate: ->

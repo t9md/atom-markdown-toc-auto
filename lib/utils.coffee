@@ -1,11 +1,12 @@
 _ = require 'underscore-plus'
 {Range} = require 'atom'
+{inspect} = require 'util'
 
-TOC_START_TEMPLATE = "<!-- TOC START:CONFIG_PART -->"
-CONFIG_PART = " min:MIN_LEVEL max:MAX_LEVEL"
-TOC_START = TOC_START_TEMPLATE.replace('CONFIG_PART', CONFIG_PART)
+settings = require './settings'
+
 TOC_END = '<!-- TOC END -->'
-HEADER_REGEXP = /^(#+)\s*(.*$)$/g
+TOC_START_REGEXP = /<!\-\- TOC START (.*)?\-\->/
+TOC_END_REGEXP = ///#{_.escapeRegExp(TOC_END)}///
 
 # TOC generation
 # -------------------------
@@ -31,9 +32,10 @@ isValidHeader = (editor, bufferPosition) ->
   scopeDescriptor = editor.scopeDescriptorForBufferPosition(bufferPosition)
   scopeDescriptor.scopes[1]?.startsWith('markup.heading')
 
+MARKDOWN_HEADER_REGEXP = /^(#+)\s*(.*$)$/g
 scanHeaders = (editor) ->
   headers = []
-  editor.scan HEADER_REGEXP, ({match, range}) ->
+  editor.scan MARKDOWN_HEADER_REGEXP, ({match, range}) ->
     return unless isValidHeader(editor, range.start)
     level = match[1].length
     subject = extractLinkText(match[2])
@@ -42,49 +44,58 @@ scanHeaders = (editor) ->
 
 # Misc
 # -------------------------
-TOC_START_REGEXP = _.escapeRegExp(TOC_START)
-  .replace('MIN_LEVEL', '(\\d)')
-  .replace('MAX_LEVEL', '(\\d)')
-
 extractTocSpec = (text) ->
   spec = {}
   if match = text.match(TOC_START_REGEXP)
-    spec.minLevel = Math.max(match[1], 1)
-    spec.maxLevel = Math.max(match[2], 1)
-  spec
+    params = match[1].trim().split(/\s+/)
+    for param in params
+      [key, value] = param.split(':')
+      switch key
+        when 'min', 'max'
+          spec[key] = Number(value)
+        else
+          if value in ['true', 'false']
+            spec[key] = value is 'true'
+    spec
+
+serializeTocSpec = (tocSpec) ->
+  JSON.stringify(tocSpec)
+    .replace(/[{"}]/g, '')
+    .replace(/,/g, ' ')
 
 getDefaultTocSpec = ->
-  minLevel: atom.config.get('markdown-toc-auto.initialMinLevel')
-  maxLevel: atom.config.get('markdown-toc-auto.initialMaxLevel')
+  settings.getSpecOptions()
 
-insertToc = (editor, range, {minLevel, maxLevel, update}) ->
+insertToc = (editor, range, create=false, tocSpec) ->
   headers = scanHeaders(editor).filter (header) ->
-    minLevel <= header.level <=  maxLevel
+    tocSpec.min <= header.level <= tocSpec.max
 
-  tocStart = TOC_START
-    .replace('MIN_LEVEL', minLevel)
-    .replace('MAX_LEVEL', maxLevel)
+  # console.log tocSpec.update
+  {inspect} = require 'util'
+  p = (args...) -> console.log inspect(args...)
+  p tocSpec
+  return if (not create) and (not tocSpec.update)
 
+  tocSpecString = serializeTocSpec(tocSpec)
   toc = """
-    #{tocStart}
+    <!-- TOC START #{tocSpecString} -->
     #{generateToc(headers)}
 
     #{TOC_END}
     """
 
-  toc += "\n\n" unless update
+  toc += "\n\n" if create
   editor.setTextInBufferRange(range, toc)
 
 # Public
 # -------------------------
 exports.createToc = (editor, point) ->
-  options = _.defaults(getDefaultTocSpec(), update: false)
-  insertToc(editor, [point, point], options)
+  insertToc(editor, [point, point], true, getDefaultTocSpec())
 
 exports.updateToc = (editor, range) ->
   tocStartText = editor.lineTextForBufferRow(range.start.row)
-  options = _.defaults(extractTocSpec(tocStartText), update: true)
-  insertToc(editor, range, options)
+  options = _.defaults(extractTocSpec(tocStartText), getDefaultTocSpec())
+  insertToc(editor, range, false, options)
 
 exports.isMarkDownEditor = (editor) ->
   editor.getGrammar().scopeName is "source.gfm"
@@ -93,18 +104,15 @@ exports.findExistingTocRange = (editor) ->
   rangeStart = null
   rangeEnd = null
 
-  pattern = _.escapeRegExp(TOC_START_TEMPLATE).replace('CONFIG_PART', '.*')
-  pattern = ///^#{pattern}$///
   scanRange = new Range([0, 0], editor.getEofBufferPosition())
-  editor.scanInBufferRange pattern, scanRange, ({range, stop}) ->
+  editor.scanInBufferRange TOC_START_REGEXP, scanRange, ({range, stop}) ->
     rangeStart = range.start
     scanRange.start = range.end
     stop()
 
   return unless rangeStart?
 
-  pattern = ///#{_.escapeRegExp(TOC_END)}///
-  editor.scanInBufferRange pattern, scanRange, ({range, stop}) ->
+  editor.scanInBufferRange TOC_END_REGEXP, scanRange, ({range, stop}) ->
     rangeEnd = range.end
     stop()
 
