@@ -31,9 +31,9 @@ Automatically update table of contents for GitHub wiki.
 
 # Limitation
 
-Currently only `source gfm` editor is supported.  
-And only checked with GitHub Wiki.  
-Header style must start with `#`.  
+- Currently only `source gfm` editor is supported.
+- And only checked with GitHub Wiki.
+- Header style must start with `#`.
 
 # Why I created yet another packge?
 

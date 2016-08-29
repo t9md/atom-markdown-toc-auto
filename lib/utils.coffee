@@ -91,7 +91,7 @@ insertToc = ({editor, range, tocOptions}) ->
 createToc = (editor, point) ->
   insertToc(
     editor: editor
-    range: [point, point]
+    range: new Range(point, point)
     tocOptions: getDefaultTocOptions()
   )
 
