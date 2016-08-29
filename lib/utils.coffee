@@ -30,7 +30,6 @@ generateToc = (headers, tocOptions) ->
     .map ({level, subject}) ->
       indent = indentBase.repeat(level-1)
       title = titleFor(subject)
-      console.log title
       if tocOptions.link
         "#{indent}- [#{title}](##{linkFor(subject)})"
       else
@@ -49,7 +48,7 @@ scanHeaders = (editor) ->
   headers = []
   editor.scan MARKDOWN_HEADER_REGEXP, ({match, range}) ->
     return unless isMarkdownHeader(editor, range.start)
-    level = match[1].length - 1
+    level = match[1].length
     subject = match[2]
     headers.push({level, subject})
   headers

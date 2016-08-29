@@ -4,7 +4,7 @@ Automatically update table of contents for GitHub wiki.
 
 ![gif](https://raw.githubusercontent.com/t9md/t9md/12d553f0ec6d5ae921dea200ae2250f718a09523/img/atom-markdown-toc-auto.gif)
 
-# Features
+# Featuresaa
 
 - Insert TOC
 - Automatically update TOC on editor save.
@@ -41,6 +41,7 @@ Header style must start with `#`.
 - Wanted to correctly ignore embedded code's comment `#`.
 - Wanted to generate valid link in github wiki(for [vim-mode-plus](https://atom.io/packages/vim-mode-plus)'s wiki).
 
-# Related project
+# Similar project
 
 - [markdown-toc](https://atom.io/packages/markdown-toc)
+- [atom-mdtoc](https://atom.io/packages/atom-mdtoc)

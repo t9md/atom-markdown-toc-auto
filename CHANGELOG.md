@@ -1,4 +1,8 @@
-# 0.4.0
+# 0.4.1
+- Fix: Header was not genrated correctly
+- Fix: debug print on `generateToc`
+
+# 0.4.0 unpublished
 - Improve: Re-organize file organization(extract private function to utils.coffee).
 - New, Breaking: New(`link`, `update`). Renamed(`initialMinLevel` to `min`,  `initialMaxLevel` to `max`).
 - Internal: Cleanup codes.
