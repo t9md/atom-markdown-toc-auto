@@ -8,8 +8,8 @@ Automatically update table of contents for GitHub wiki.
 
 - Insert TOC
 - Automatically update TOC on editor save.
-- Can change max level of header to use for toc by embedded TOC header.
-- Ignore embedded code in markdown.
+- Customizable `max` and `min` level of header to use. auto `update`, inlucde `link` or not.
+- Extract only markdown header by using Atom's scope descriptor used in syntax highlight(So ignore `#` in embedded code in markdown).
 - Generate link for GitHub wiki
   - Remove invalid char for link
   - Extract inner text(`xxx`) from `<kbd>xxx</kbd>` tag and use in link.
@@ -19,7 +19,10 @@ Automatically update table of contents for GitHub wiki.
 1. Open markdown editor
 2. From command-palette, invoke "Markdown Toc Auto: Insert Toc". TOC is inserted at cursor position.
 3. Each time you save editor, TOC is automatically updated.
-4. [Optional] You can change min/max header level to use by modifying TOC header(`<!-- TOC START min: 1 max:3 -->`) directly.
+4. [Optional] You can change following TOC options to control toc generation.
+  - `min`, `max`: From `min` to `max` level headers are subject to generate.
+  - `update`: If `true`, automatically updated on save.
+  - `link`: If `false`, link are not generated.
 
 # Commands
 

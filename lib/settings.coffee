@@ -1,5 +1,5 @@
 class Settings
-  tocOptionKeys: ['min', 'max', 'style', 'link', 'update']
+  tocOptionKeys: ['min', 'max', 'link', 'update']
 
   constructor: (@scope, @config) ->
     # Inject order props to display orderd in setting-view
@@ -43,8 +43,3 @@ module.exports = new Settings 'markdown-toc-auto',
     type: 'boolean'
     default: true
     description: "Link option on create"
-  style:
-    type: 'string'
-    default: 'ul'
-    enum: ['ul', 'ol']
-    description: "Style option on create"

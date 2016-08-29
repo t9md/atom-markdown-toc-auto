@@ -20,7 +20,8 @@ module.exports =
       # [FIXME] maybe buffer is different but path is same possibility?
       do (editor) =>
         disposable = editor.onDidSave ->
-          updateToc(editor, range) if isMarkDownEditor(editor) and (range = findTocRange(editor))
+          if isMarkDownEditor(editor) and (range = findTocRange(editor))
+            updateToc(editor, range)
         @subscriptionByBuffer.set(editor.buffer, disposable)
 
   deactivate: ->

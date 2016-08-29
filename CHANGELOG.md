@@ -1,5 +1,8 @@
-# 0.x.0: WIP for 0.4.0
+# 0.4.0
 - Improve: Re-organize file organization(extract private function to utils.coffee).
+- New, Breaking: New(`link`, `update`). Renamed(`initialMinLevel` to `min`,  `initialMaxLevel` to `max`).
+- Internal: Cleanup codes.
+- Improve: Extract link text from img link(`![]`).
 
 # 0.3.0:
 - New, Breaking: `insert-toc` renamed to `insert-toc-at-top` and existing `insert-toc` insert TOC at cursor.
