@@ -112,25 +112,16 @@ updateToc = (editor, range) ->
 isMarkDownEditor = (editor) ->
   editor.getGrammar().scopeName is "source.gfm"
 
-findRangeForPattern = (editor, pattern, scanRange) ->
-  found = null
-  editor.scanInBufferRange pattern, scanRange, ({range, stop}) ->
-    found = range
-    stop()
-  found
-
 findTocRange = (editor) ->
-  [tocStartRange, tocEndRange] = []
-
+  tocRange = []
   scanRange = new Range([0, 0], editor.getEofBufferPosition())
-  tocStartRange = findRangeForPattern(editor, TOC_START_REGEXP, scanRange)
+  editor.scanInBufferRange TOC_START_REGEXP, scanRange, ({range}) -> tocRange.push(range)
 
-  return unless tocStartRange?
+  return unless tocRange.length is 0
 
-  scanRange.start = tocStartRange.end
-  tocEndRange = findRangeForPattern(editor, TOC_END_REGEXP, scanRange)
-
-  new Range(tocStartRange.start, tocEndRange.end) if tocEndRange?
+  scanRange.start = tocRange[0].end
+  editor.scanInBufferRange TOC_END_REGEXP, scanRange, ({range}) -> tocRange.push(range)
+  new Range(tocRange...) if (tocRange.length is 2)
 
 module.exports = {
   createToc
