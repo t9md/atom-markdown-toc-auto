@@ -2,7 +2,6 @@ class Settings
   tocOptionKeys: ['min', 'max', 'link', 'update']
 
   constructor: (@scope, @config) ->
-    # Inject order props to display orderd in setting-view
     for name, i in Object.keys(@config)
       @config[name].order = i
 

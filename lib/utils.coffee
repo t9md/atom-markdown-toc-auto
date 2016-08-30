@@ -61,7 +61,7 @@ deserializeTocOptions = (text) ->
     [key, value] = param.split(':')
     switch key
       when 'min', 'max' # integer
-        options[key] = Number(value)
+        options[key] = value if (value = Number(value)) >= 1
       when 'link', 'update' # boolean
         options[key] = value is 'true' if value in ['true', 'false']
   options
