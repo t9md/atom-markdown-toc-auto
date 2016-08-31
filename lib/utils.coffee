@@ -21,16 +21,16 @@ titleFor = (text) ->
     .replace(/\[(.*?)\]\(https?:\/\/.*?\)/g, "$1") # extract link txt
     .trim()
 
-generateToc = (headers, tocOptions) ->
+generateToc = (headers, options) ->
   indentBase = "  "
   headers
     .filter (header) ->
-      tocOptions.min <= header.level <= tocOptions.max
+      options.min <= header.level <= options.max
 
     .map ({level, subject}) ->
       indent = indentBase.repeat(level-1)
       title = titleFor(subject)
-      if tocOptions.link
+      if options.link
         "#{indent}- [#{title}](##{linkFor(subject)})"
       else
         "#{indent}- [#{title}]"
@@ -74,11 +74,12 @@ serializeTocOptions = (tocOptions) ->
 getDefaultTocOptions = ->
   settings.getTocOptions()
 
-insertToc = ({editor, range, tocOptions}) ->
+insertToc = ({editor, range, options}) ->
   headers = scanHeaders(editor)
+
   toc = """
-    <!-- TOC START #{serializeTocOptions(tocOptions)} -->
-    #{generateToc(headers, tocOptions)}
+    <!-- TOC START #{serializeTocOptions(options)} -->
+    #{generateToc(headers, options)}
 
     #{TOC_END}
     """
@@ -89,25 +90,19 @@ insertToc = ({editor, range, tocOptions}) ->
 # Public
 # -------------------------
 createToc = (editor, point) ->
-  insertToc(
-    editor: editor
-    range: new Range(point, point)
-    tocOptions: getDefaultTocOptions()
-  )
+  range = new Range(point, point)
+  insertToc({editor, range, options: getDefaultTocOptions()})
 
 updateToc = (editor, range) ->
   tocStartText = editor.lineTextForBufferRow(range.start.row)
 
-  tocOptions = {}
+  options = {}
   if match = tocStartText.match(TOC_START_REGEXP)
-    tocOptions = deserializeTocOptions(match[1])
-    return unless tocOptions.update
+    options = deserializeTocOptions(match[1])
 
-  insertToc(
-    editor: editor
-    range: range
-    tocOptions: _.defaults(tocOptions, getDefaultTocOptions())
-  )
+  options = _.defaults(options, getDefaultTocOptions())
+
+  insertToc({editor, range, options}) if options.update
 
 isMarkDownEditor = (editor) ->
   editor.getGrammar().scopeName is "source.gfm"
@@ -115,13 +110,14 @@ isMarkDownEditor = (editor) ->
 findTocRange = (editor) ->
   tocRange = []
   scanRange = new Range([0, 0], editor.getEofBufferPosition())
-  editor.scanInBufferRange TOC_START_REGEXP, scanRange, ({range}) -> tocRange.push(range)
+  editor.scanInBufferRange TOC_START_REGEXP, scanRange, ({range}) ->
+    tocRange.push(range)
 
-  return unless tocRange.length is 0
+  return if tocRange.length is 0
 
   scanRange.start = tocRange[0].end
   editor.scanInBufferRange TOC_END_REGEXP, scanRange, ({range}) -> tocRange.push(range)
-  new Range(tocRange...) if (tocRange.length is 2)
+  new Range(tocRange[0].start, tocRange[1].end) if tocRange.length is 2
 
 module.exports = {
   createToc

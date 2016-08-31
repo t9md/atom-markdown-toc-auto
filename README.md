@@ -4,7 +4,7 @@ Automatically update table of contents for GitHub wiki.
 
 ![gif](https://raw.githubusercontent.com/t9md/t9md/12d553f0ec6d5ae921dea200ae2250f718a09523/img/atom-markdown-toc-auto.gif)
 
-# Featuresaa
+# Features
 
 - Insert TOC
 - Automatically update TOC on editor save.
@@ -35,7 +35,7 @@ Automatically update table of contents for GitHub wiki.
 - And only checked with GitHub Wiki.
 - Header style must start with `#`.
 
-# Why I created yet another packge?
+# Why I created yet another package?
 
 - As exercise.
 - Wanted to correctly ignore embedded code's comment `#`.
