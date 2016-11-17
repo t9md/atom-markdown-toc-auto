@@ -1,3 +1,10 @@
+# 0.5.0
+- Improve: No longer have to save twice to save updated toc at `onDidSave` timing.
+  - Since now use `onWillSave` event instead of previous `onDidSave`.
+- Fix: Guard to be called auto toc update hook multiple time on save file #2
+- Improve: Keep cursor position before and after the toc insertion.
+- Improve: Skip toc insertion from undo handling.
+
 # 0.4.1
 - Fix: Header was not genrated correctly
 - Fix: debug print on `generateToc`
