@@ -8,7 +8,7 @@ module.exports =
   config: settings.config
 
   activate: ->
-    @subscriptionByBuffer = new Map
+    @subscriptionByURL = new Map
 
     @subscriptions = new CompositeDisposable
     @subscribe atom.commands.add 'atom-text-editor[data-grammar="source gfm"]',
@@ -16,19 +16,20 @@ module.exports =
       'markdown-toc-auto:insert-toc-at-top': -> createToc(@getModel(), [0, 0])
 
     @subscribe atom.workspace.observeTextEditors (editor) =>
-      return if @subscriptionByBuffer.has(editor.buffer)
-      # [FIXME] maybe buffer is different but path is same possibility?
-      do (editor) =>
-        disposable = editor.onDidSave ->
-          if isMarkDownEditor(editor) and (range = findTocRange(editor))
-            updateToc(editor, range)
-        @subscriptionByBuffer.set(editor.buffer, disposable)
+      URI = editor.getURI()
+      return if @subscriptionByURL.has(URI)
+
+      disposable = editor.buffer.onWillSave ->
+        if isMarkDownEditor(editor) and (range = findTocRange(editor))
+          updateToc(editor, range)
+
+      @subscriptionByURL.set(URI, disposable)
 
   deactivate: ->
     @subscriptions?.dispose()
-    @subscriptionByBuffer.forEach (disposable) -> disposable.dispose()
-    @subscriptionByBuffer.clear()
-    {@subscriptions, @subscriptionByBuffer} = {}
+    @subscriptionByURL.forEach (disposable) -> disposable.dispose()
+    @subscriptionByURL.clear()
+    {@subscriptions, @subscriptionByURL} = {}
 
   subscribe: (arg) ->
     @subscriptions.add(arg)

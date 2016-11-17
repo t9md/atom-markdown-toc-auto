@@ -85,7 +85,20 @@ insertToc = ({editor, range, options}) ->
     """
 
   toc += "\n\n" if range.isEmpty()
-  editor.setTextInBufferRange(range, toc)
+  bufferPositionByCursor = new Map()
+
+  # Save original cursor position for the cusor which point will change.
+  for cursor in editor.getCursors() when point = cursor.getBufferPosition()
+    if range.containsPoint(point)
+      bufferPositionByCursor.set(cursor, point)
+
+  editor.setTextInBufferRange(range, toc, undo: 'skip')
+
+  # Restore oiginal cursor position
+  for cursor in editor.getCursors() when point = bufferPositionByCursor.get(cursor)
+    cursor.setBufferPosition(point)
+
+  bufferPositionByCursor.clear()
 
 # Public
 # -------------------------
