@@ -46,24 +46,3 @@ describe "markdown-toc-auto", ->
       expect(deserializeTocOptions('abc:def')).toEqual({})
       expect(deserializeTocOptions('abc')).toEqual({})
       expect(deserializeTocOptions('')).toEqual({})
-
-  # WIP
-  xdescribe "??", ->
-    [workDir, editor] = []
-
-    beforeEach ->
-      waitsForPromise ->
-        atom.packages.activatePackage('language-gfm')
-
-      waitsForPromise ->
-        temp.mkdirSync('working')
-        workDir = temp.path()
-        filePathDst = path.join(workDir, "sample.md")
-        fs.copySync(atom.project.resolvePath('./'), workDir)
-        atom.workspace.open(filePathDst).then (e) ->
-          editor = e
-
-    # describe "generateToc", ->
-    #   it "create path", ->
-    #     console.log editor.getGrammar().scopeName
-    #     console.log editor.getPath()
