@@ -31,7 +31,7 @@ generateToc = (headers, options) ->
       indent = indentBase.repeat(level-1)
       title = titleFor(subject)
       if options.link
-        "#{indent}- [#{title}](##{linkFor(subject)})"
+        "#{indent}- [#{title}](##{linkFor(title)})"
       else
         "#{indent}- [#{title}]"
 
@@ -127,4 +127,6 @@ module.exports = {
 
   deserializeTocOptions
   serializeTocOptions
+  generateToc
+  scanHeaders
 }

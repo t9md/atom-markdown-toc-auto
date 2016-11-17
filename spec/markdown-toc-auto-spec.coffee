@@ -1,5 +1,15 @@
 settings = require '../lib/settings'
-{deserializeTocOptions, serializeTocOptions} = require '../lib/utils'
+fs = require 'fs-plus'
+temp = require 'temp'
+
+path = require 'path'
+{
+  deserializeTocOptions
+  serializeTocOptions
+  generateToc
+} = require '../lib/utils'
+
+temp = require('temp').track()
 
 describe "markdown-toc-auto", ->
   describe "settings", ->
@@ -36,3 +46,24 @@ describe "markdown-toc-auto", ->
       expect(deserializeTocOptions('abc:def')).toEqual({})
       expect(deserializeTocOptions('abc')).toEqual({})
       expect(deserializeTocOptions('')).toEqual({})
+
+  # WIP
+  xdescribe "??", ->
+    [workDir, editor] = []
+
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('language-gfm')
+
+      waitsForPromise ->
+        temp.mkdirSync('working')
+        workDir = temp.path()
+        filePathDst = path.join(workDir, "sample.md")
+        fs.copySync(atom.project.resolvePath('./'), workDir)
+        atom.workspace.open(filePathDst).then (e) ->
+          editor = e
+
+    # describe "generateToc", ->
+    #   it "create path", ->
+    #     console.log editor.getGrammar().scopeName
+    #     console.log editor.getPath()

@@ -10,5 +10,9 @@
   },
   "dependencies": {
     "underscore-plus": "^1.6.6"
+  },
+  "devDependencies": {
+    "fs-plus": "^2.9.1",
+    "temp": "^0.8.3"
   }
 }
