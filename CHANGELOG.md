@@ -1,3 +1,6 @@
+# 0.6.0
+- Improve: Add link suffix when same subject header appeared multiple time. #6
+
 # 0.5.0
 - Improve: No longer have to save twice to save updated toc at `onDidSave` timing.
   - Since now use `onWillSave` event instead of previous `onDidSave`.
