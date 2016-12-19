@@ -19,9 +19,11 @@ module.exports =
       URI = editor.getURI()
       return if @subscriptionByURL.has(URI)
 
+      tocRange = null
       disposable = editor.buffer.onWillSave ->
-        if isMarkDownEditor(editor) and (range = findTocRange(editor))
-          updateToc(editor, range)
+        if isMarkDownEditor(editor) and (tocRange = findTocRange(editor))
+          updateToc(editor, tocRange)
+          tocRange = null
 
       @subscriptionByURL.set(URI, disposable)
 

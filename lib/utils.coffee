@@ -115,7 +115,8 @@ updateToc = (editor, range) ->
 
   options = _.defaults(options, getDefaultTocOptions())
 
-  insertToc({editor, range, options}) if options.update
+  if options.update
+    insertToc({editor, range, options})
 
 isMarkDownEditor = (editor) ->
   editor.getGrammar().scopeName is "source.gfm"
