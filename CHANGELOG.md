@@ -1,3 +1,6 @@
+# 0.6.1
+- Fix: Degradation link options were ignored. Respect it again.
+
 # 0.6.0
 - Improve: Add link suffix when same subject header appeared multiple time. #6
 
