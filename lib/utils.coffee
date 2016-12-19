@@ -23,21 +23,21 @@ titleFor = (text) ->
 
 # Set title and link
 setTitleAndLink = (headers) ->
-  countBySubject = {}
+  countByLink = {}
 
   for header in headers
-    {subject} = header
+    title = titleFor(header.subject)
+    link = linkFor(title)
 
-    if not (subject of countBySubject)
-      countBySubject[subject] = 0
+    if not (link of countByLink)
+      countByLink[link] = 0
       linkSuffix = ''
     else
-      countBySubject[subject] += 1
-      linkSuffix = "-" + countBySubject[subject]
+      countByLink[link] += 1
+      linkSuffix = "-" + countByLink[link]
 
-    title = titleFor(subject)
     header.title = title
-    header.link = linkFor(title) + linkSuffix
+    header.link = link + linkSuffix
 
 generateToc = (headers, options) ->
   indentBase = "  "

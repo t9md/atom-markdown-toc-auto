@@ -1,3 +1,6 @@
+# 0.6.2
+- Improve: Accurate link suffix when header include special character.
+
 # 0.6.1
 - Fix: Degradation link options were ignored. Respect it again.
 
