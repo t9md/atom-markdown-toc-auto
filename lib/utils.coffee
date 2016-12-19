@@ -21,17 +21,34 @@ titleFor = (text) ->
     .replace(/\[(.*?)\]\(https?:\/\/.*?\)/g, "$1") # extract link txt
     .trim()
 
+# Set title and link
+setTitleAndLink = (headers) ->
+  countBySubject = {}
+
+  for header in headers
+    {subject} = header
+
+    if not (subject of countBySubject)
+      countBySubject[subject] = 0
+      linkSuffix = ''
+    else
+      countBySubject[subject] += 1
+      linkSuffix = "-" + countBySubject[subject]
+
+    title = titleFor(subject)
+    header.title = title
+    header.link = linkFor(title) + linkSuffix
+
 generateToc = (headers, options) ->
   indentBase = "  "
   headers
     .filter (header) ->
       options.min <= header.level <= options.max
 
-    .map ({level, subject}) ->
+    .map ({level, title, link}) ->
       indent = indentBase.repeat(level-1)
-      title = titleFor(subject)
-      if options.link
-        "#{indent}- [#{title}](##{linkFor(title)})"
+      if link?
+        "#{indent}- [#{title}](##{link})"
       else
         "#{indent}- [#{title}]"
 
@@ -76,6 +93,7 @@ getDefaultTocOptions = ->
 
 insertToc = ({editor, range, options}) ->
   headers = scanHeaders(editor)
+  setTitleAndLink(headers)
 
   toc = """
     <!-- TOC START #{serializeTocOptions(options)} -->
