@@ -121,6 +121,7 @@ insertToc = ({editor, range, options}) ->
 # Public
 # -------------------------
 createToc = (editor, point) ->
+  point ?= editor.getCursorBufferPosition()
   range = new Range(point, point)
   insertToc({editor, range, options: getDefaultTocOptions()})
 
@@ -135,9 +136,6 @@ updateToc = (editor, range) ->
 
   if options.update
     insertToc({editor, range, options})
-
-isMarkDownEditor = (editor) ->
-  editor.getGrammar().scopeName is "source.gfm"
 
 findTocRange = (editor) ->
   tocRange = []
@@ -154,7 +152,6 @@ findTocRange = (editor) ->
 module.exports = {
   createToc
   updateToc
-  isMarkDownEditor
   findTocRange
 
   deserializeTocOptions
