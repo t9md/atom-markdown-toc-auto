@@ -1,3 +1,6 @@
+# 0.7.0: WIP
+- Improve: Package activation performance improved.
+
 # 0.6.2
 - Improve: Accurate link suffix when header include special character.
 
