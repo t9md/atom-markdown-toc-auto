@@ -1,6 +1,8 @@
 {CompositeDisposable} = require 'atom'
-{createToc, updateToc, isMarkDownEditor, findTocRange} = require './utils'
 settings = require './settings'
+
+utils = null
+getUtils = -> utils ?= require('./utils')
 
 # Main
 # -------------------------
@@ -12,17 +14,18 @@ module.exports =
 
     @subscriptions = new CompositeDisposable
     @subscribe atom.commands.add 'atom-text-editor[data-grammar="source gfm"]',
-      'markdown-toc-auto:insert-toc': -> createToc(@getModel(), @getModel().getCursorBufferPosition())
-      'markdown-toc-auto:insert-toc-at-top': -> createToc(@getModel(), [0, 0])
+      'markdown-toc-auto:insert-toc': -> getUtils().createToc(@getModel())
+      'markdown-toc-auto:insert-toc-at-top': -> getUtils().createToc(@getModel(), [0, 0])
 
     @subscribe atom.workspace.observeTextEditors (editor) =>
       URI = editor.getURI()
+      return unless editor.getGrammar().scopeName is "source.gfm"
       return if @subscriptionByURL.has(URI)
 
       tocRange = null
       disposable = editor.buffer.onWillSave ->
-        if isMarkDownEditor(editor) and (tocRange = findTocRange(editor))
-          updateToc(editor, tocRange)
+        if tocRange ?= getUtils().findTocRange(editor)
+          getUtils().updateToc(editor, tocRange)
           tocRange = null
 
       @subscriptionByURL.set(URI, disposable)
