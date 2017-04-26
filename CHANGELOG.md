@@ -1,4 +1,4 @@
-# 0.7.0: WIP
+# 0.7.0:
 - Improve: Package activation performance improved.
 
 # 0.6.2
