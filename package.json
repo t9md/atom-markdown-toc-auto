@@ -8,6 +8,34 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
+  "configSchema": {
+    "min": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Minimum header level on create toc",
+      "order": 0
+    },
+    "max": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 3,
+      "description": "Maximum header level on create toc",
+      "order": 1
+    },
+    "update": {
+      "type": "boolean",
+      "default": true,
+      "description": "Update option on create",
+      "order": 2
+    },
+    "link": {
+      "type": "boolean",
+      "default": true,
+      "description": "Link option on create",
+      "order": 3
+    }
+  },
   "dependencies": {
     "underscore-plus": "^1.6.6"
   },

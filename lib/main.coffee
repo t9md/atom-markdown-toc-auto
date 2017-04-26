@@ -1,5 +1,4 @@
 {CompositeDisposable} = require 'atom'
-settings = require './settings'
 
 utils = null
 getUtils = -> utils ?= require('./utils')
@@ -7,8 +6,6 @@ getUtils = -> utils ?= require('./utils')
 # Main
 # -------------------------
 module.exports =
-  config: settings.config
-
   activate: ->
     @subscriptionByURL = new Map
 

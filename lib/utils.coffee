@@ -1,6 +1,5 @@
 _ = require 'underscore-plus'
 {Range} = require 'atom'
-settings = require './settings'
 
 TOC_END = '<!-- TOC END -->'
 TOC_START_REGEXP = /<!\-\- TOC START (.*)?\-\->/i
@@ -89,7 +88,10 @@ serializeTocOptions = (tocOptions) ->
     .replace(/,/g, ' ')
 
 getDefaultTocOptions = ->
-  settings.getTocOptions()
+  options = {}
+  for param in ['min', 'max', 'link', 'update']
+    options[param] = atom.config.get("markdown-toc-auto.#{param}")
+  options
 
 insertToc = ({editor, range, options}) ->
   headers = scanHeaders(editor)

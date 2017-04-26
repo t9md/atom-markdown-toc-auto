@@ -1,4 +1,3 @@
-settings = require '../lib/settings'
 fs = require 'fs-plus'
 temp = require 'temp'
 
@@ -12,17 +11,6 @@ path = require 'path'
 temp = require('temp').track()
 
 describe "markdown-toc-auto", ->
-  describe "settings", ->
-    it "hold tocOption specific keys", ->
-      expect(settings.tocOptionKeys).toEqual(['min', 'max', 'link', 'update'])
-
-    it "return collection of settings for tocOptions", ->
-      options = settings.getTocOptions()
-      expect(Object.keys(options)).toEqual(settings.tocOptionKeys)
-      for key, value of options
-        configValue = atom.config.get("markdown-toc-auto.#{key}")
-        expect(options[key]).toBe(configValue)
-
   describe "serialize/desirializeTocOptions", ->
     it "serialize", ->
       serialized = serializeTocOptions({min: 1, max: 1, link: true, update: true})
