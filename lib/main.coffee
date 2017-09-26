@@ -14,9 +14,13 @@ module.exports =
       'markdown-toc-auto:insert-toc': -> getUtils().createToc(@getModel())
       'markdown-toc-auto:insert-toc-at-top': -> getUtils().createToc(@getModel(), [0, 0])
 
+    @subscribe atom.commands.add 'atom-text-editor[data-grammar="text md"]',
+      'markdown-toc-auto:insert-toc': -> getUtils().createToc(@getModel())
+      'markdown-toc-auto:insert-toc-at-top': -> getUtils().createToc(@getModel(), [0, 0])
+
     @subscribe atom.workspace.observeTextEditors (editor) =>
       URI = editor.getURI()
-      return unless editor.getGrammar().scopeName is "source.gfm"
+      return unless editor.getGrammar().scopeName in ["source.gfm","text.md"]
       return if @subscriptionByURL.has(URI)
 
       tocRange = null
