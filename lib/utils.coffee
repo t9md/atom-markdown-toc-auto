@@ -57,7 +57,7 @@ generateToc = (headers, options) ->
 # -------------------------
 isMarkdownHeader = (editor, bufferPosition) ->
   {scopes} = editor.scopeDescriptorForBufferPosition(bufferPosition)
-  scopes[1]?.startsWith('markup.heading')
+  scopes[1]?.startsWith('markup.heading') or scopes[1]?.startsWith('heading.markup.md')
 
 MARKDOWN_HEADER_REGEXP = /^(#+)\s*(.*$)$/g
 scanHeaders = (editor) ->
