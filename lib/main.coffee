@@ -10,17 +10,17 @@ module.exports =
     @subscriptionByURL = new Map
 
     @subscriptions = new CompositeDisposable
-    @subscribe atom.commands.add 'atom-text-editor[data-grammar="source gfm"]',
+
+    commands =
       'markdown-toc-auto:insert-toc': -> getUtils().createToc(@getModel())
       'markdown-toc-auto:insert-toc-at-top': -> getUtils().createToc(@getModel(), [0, 0])
 
-    @subscribe atom.commands.add 'atom-text-editor[data-grammar="text md"]',
-      'markdown-toc-auto:insert-toc': -> getUtils().createToc(@getModel())
-      'markdown-toc-auto:insert-toc-at-top': -> getUtils().createToc(@getModel(), [0, 0])
+    @subscribe atom.commands.add('atom-text-editor[data-grammar="source gfm"]', commands)
+    @subscribe atom.commands.add('atom-text-editor[data-grammar="text md"]', commands)
 
     @subscribe atom.workspace.observeTextEditors (editor) =>
       URI = editor.getURI()
-      return unless editor.getGrammar().scopeName in ["source.gfm","text.md"]
+      return unless editor.getGrammar().scopeName in ["source.gfm", "text.md"]
       return if @subscriptionByURL.has(URI)
 
       tocRange = null

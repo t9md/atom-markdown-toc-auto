@@ -1,3 +1,8 @@
+# 0.8.0:
+- Improve: Add support for `language-markdown` grammar by @thancock20.
+  - Caution: This pkg still intended to generate toc only for `gfm`.
+  - Why I added this is just to mitigate frustration for user using `language-markdown` for all `.md` file.
+
 # 0.7.0:
 - Improve: Package activation performance improved.
 
