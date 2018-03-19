@@ -45,7 +45,7 @@ generateToc = (headers, options) ->
       options.min <= header.level <= options.max
 
     .map ({level, title, link}) ->
-      indent = indentBase.repeat(level-1)
+      indent = indentBase.repeat(level-options.min)
       if options.link
         "#{indent}- [#{title}](##{link})"
       else
