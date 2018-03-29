@@ -1,3 +1,7 @@
+# 0.9.0:
+- Improve: Specified `min` level header now have ZERO indent #13 by @nemoDreamer
+- Maintenance: Convert to JavaScript from CoffeeScript.
+
 # 0.8.0:
 - Improve: Add support for `language-markdown` grammar by @thancock20.
   - Caution: This pkg still intended to generate toc only for `gfm`.
