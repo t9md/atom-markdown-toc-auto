@@ -1,3 +1,6 @@
+# 0.9.1:
+- Fix: Fix deprecated `undo` option for `editor.setTextInBufferRange()` function. #17
+
 # 0.9.0:
 - Improve: Specified `min` level header now have ZERO indent #13 by @nemoDreamer
 - Maintenance: Convert to JavaScript from CoffeeScript.
