@@ -1,3 +1,6 @@
+# 0.10.0:
+- Fix: No longer eliminate harmless multibyte chars in header, so now header containing multibyte chars is properly linked. #19
+
 # 0.9.1:
 - Fix: Fix deprecated `undo` option for `editor.setTextInBufferRange()` function. #17
 
