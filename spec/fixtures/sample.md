@@ -1,15 +1,15 @@
-<!-- TOC START max:3 min:1 link:true update:true -->
+<!-- TOC START min:1 max:3 link:true update:true -->
 - [kind](#kind)
     - [Operations package](#operations-package)
     - [Other package](#other-package)
-- [Operations package](#operations-package)
+- [Operations package](#operations-package-1)
     - [move-to-symbols by t9md](#move-to-symbols-by-t9md)
     - [jasmine-increase-focus by t9md](#jasmine-increase-focus-by-t9md)
     - [subword-movement by crshd](#subword-movement-by-crshd)
     - [replace-with-execution by t9md](#replace-with-execution-by-t9md)
     - [move-selected-text by t9md](#move-selected-text-by-t9md)
     - [quick-highlight by t9md](#quick-highlight-by-t9md)
-- [Other package](#other-package)
+- [Other package](#other-package-1)
     - [vim-mode-plus-ex-mode by t9md](#vim-mode-plus-ex-mode-by-t9md)
     - [project-find-from-search by t9md](#project-find-from-search-by-t9md)
     - [narrow by t9md](#narrow-by-t9md)
