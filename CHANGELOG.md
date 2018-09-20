@@ -1,3 +1,6 @@
+# 0.12.0:
+- Improve: Respect editor's indent setting(e.g. tab or soft-tab, number of spaces for softtabs.)
+
 # 0.11.0:
 - Fix: Fix inappropriate link target generation. Now correctly extract textContent from TAG by @justinhartman. #20
 - Improve: Improve toc title extraction from header, now strip 'a' tag from toc title. #21
