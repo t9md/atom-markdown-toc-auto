@@ -1,3 +1,8 @@
+# 0.11.0:
+- Fix: Fix inappropriate link target generation. Now correctly extract textContent from TAG by @justinhartman. #20
+- Improve: Improve toc title extraction from header, now strip 'a' tag from toc title. #21
+- Improve: Add test specs. #21
+
 # 0.10.0:
 - Fix: No longer eliminate harmless multibyte chars in header, so now header containing multibyte chars is properly linked. #19
 
