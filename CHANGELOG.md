@@ -1,3 +1,6 @@
+# 0.14.0:
+- Fix: Remove unnecessary newline at end of toc.
+
 # 0.13.0:
 - New: New `asterisk` configuration option allow user to use `*` char for genrated toc instead of default `-` char.
 
