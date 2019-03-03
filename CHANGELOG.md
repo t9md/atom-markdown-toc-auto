@@ -1,3 +1,6 @@
+# 0.13.0:
+- New: New `asterisk` configuration option allow user to use `*` char for genrated toc instead of default `-` char.
+
 # 0.12.0:
 - Improve: Respect editor's indent setting(e.g. tab or soft-tab, number of spaces for softtabs.)
 
