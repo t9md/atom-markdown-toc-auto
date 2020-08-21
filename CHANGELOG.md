@@ -1,3 +1,6 @@
+# 0.14.1:
+- Fix: Logic fix bracket position. #27 by @darkdragon-001.
+
 # 0.14.0:
 - Fix: Remove unnecessary newline at end of toc.
 
